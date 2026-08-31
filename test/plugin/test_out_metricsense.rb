@@ -54,6 +54,10 @@ class MetricsenseOutputTest < Test::Unit::TestCase
     end
   end
 
+  # server restart can cause broken buffer and broken chunk.
+  # out_metricsense should ignore the chunk with warning log.
+  # Note: v1 driver validates inputs, so we hand-roll a corrupt chunk
+  # to exercise write's error handling directly.
   def test_skip_broken_chunk
     d = create_driver
 
@@ -66,6 +70,39 @@ class MetricsenseOutputTest < Test::Unit::TestCase
       d.instance.write(corrupt_chunk)
     end
     assert_equal [[]], TestBackend.data
+  end
+
+  def test_format_skips_nil_value
+    now = Time.now.to_i
+    d = create_driver
+    d.run(default_tag: 'test') do
+      d.feed(now, {'no_value_key' => 'x'})
+      d.feed(now, {'value' => 1})
+    end
+
+    assert_equal 1, TestBackend.data.flatten(1).length
+  end
+
+  def test_format_skips_nan_value
+    now = Time.now.to_i
+    d = create_driver
+    d.run(default_tag: 'test') do
+      d.feed(now, {'value' => Float::NAN})
+      d.feed(now, {'value' => 1})
+    end
+
+    assert_equal 1, TestBackend.data.flatten(1).length
+  end
+
+  def test_format_skips_infinite_value
+    now = Time.now.to_i
+    d = create_driver
+    d.run(default_tag: 'test') do
+      d.feed(now, {'value' => Float::INFINITY})
+      d.feed(now, {'value' => 1})
+    end
+
+    assert_equal 1, TestBackend.data.flatten(1).length
   end
 
   def test_reloadable

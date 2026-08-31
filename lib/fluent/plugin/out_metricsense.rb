@@ -113,8 +113,8 @@ module Fluent
     end
 
     def start
-      super
       @backend.start
+      super
     end
 
     def shutdown
@@ -129,14 +129,14 @@ module Fluent
       record = record.dup
 
       value = record.delete(@value_key)
-      return '' if value.nil?
+      return nil if value.nil?
 
       begin
         fv = value.to_f
       rescue
-        return ''
+        return nil
       end
-      return '' if fv.nan? || fv.infinite?
+      return nil if fv.nan? || fv.infinite?
 
       iv = fv.to_i
       value = iv.to_f == fv ? iv : fv
