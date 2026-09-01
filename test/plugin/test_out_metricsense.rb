@@ -80,6 +80,8 @@ class MetricsenseOutputTest < Test::Unit::TestCase
       d.feed(now, {'value' => 1})
     end
 
+    assert_nil d.formatted.first
+    assert_equal 1, d.formatted.compact.length
     assert_equal 1, TestBackend.data.flatten(1).length
   end
 
@@ -91,6 +93,8 @@ class MetricsenseOutputTest < Test::Unit::TestCase
       d.feed(now, {'value' => 1})
     end
 
+    assert_nil d.formatted.first
+    assert_equal 1, d.formatted.compact.length
     assert_equal 1, TestBackend.data.flatten(1).length
   end
 
@@ -102,6 +106,8 @@ class MetricsenseOutputTest < Test::Unit::TestCase
       d.feed(now, {'value' => 1})
     end
 
+    assert_nil d.formatted.first
+    assert_equal 1, d.formatted.compact.length
     assert_equal 1, TestBackend.data.flatten(1).length
   end
 
